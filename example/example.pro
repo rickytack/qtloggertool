@@ -5,8 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
-QMAKE_CXXFLAGS += -std=gnu++11
-QMAKE_LFLAGS += -rdynamic
+QMAKE_CXXFLAGS += -std=gnu++11  -g
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -39,3 +38,5 @@ FORMS += \
         widget.ui
 
 
+
+unix:!macx: LIBS += -lSegFault

@@ -17,9 +17,9 @@ class LoggerTool
 {
 public:
     enum LoggerType{
-        AppOutputLog = 0b0000001,
-        UserEventLog = 0b0000010,
-        CrashLog     = 0b0000100
+        AppOutputLog = 0b0000001, // Qt app output (qDebug(), qWarning(),..)
+        UserEventLog = 0b0000010, // User activity (mouse and keys)
+        CrashLog     = 0b0000100  // Backtrace in case of crash
     };
 
     LoggerTool();

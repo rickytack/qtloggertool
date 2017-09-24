@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
+#include <errno.h>
 
 #include "crashhandler.h"
 
@@ -29,28 +30,22 @@ void crush_handler(int sig){
     void *array[arraySize];
     int size;
 
-//    if(sig == SIGSEGV) printf("Segmentation violation (ANSI)\n");
-//    else if(sig == SIGABRT) printf("Abort (ANSI)\n");
-//    else if(sig == SIGFPE) printf("Floating-point exception (ANSI)\n");
-    fprintf(stderr, "Error: signal %d:\n", sig);
+    fprintf(stderr, "Oops! Error: %s.\n", strsignal(sig));
 
     // get void*'s for all entries on the stack
     size = backtrace(array, arraySize);
 
-    // to console
-    backtrace_symbols_fd(array, size, STDERR_FILENO);
-
-    // // to file
-    int pfd;
-    if ((pfd = open(fileName, O_WRONLY | O_CREAT | O_TRUNC,
-                    S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) == -1){
-        perror("Cannot open output file\n");
-    }
-    else{
-        const char *buf = "Backtrace\n";
-        write(pfd, buf, strlen(buf));
-
-        backtrace_symbols_fd(array, size, pfd);
+    // launch addr2line in shell
+    // write to file its output
+    char syscom[256];
+    for (int i=0; i < size; i++){
+        if ( array[i] < (void *)0x420000 && array[i] > (void *)0x400000) {
+            sprintf(syscom, "addr2line %p -f -e %s | tee -a %s",
+                    array[i],
+                    program_invocation_short_name,
+                    fileName);
+            system(syscom);
+        }
     }
 
     exit(1);

@@ -1,3 +1,6 @@
+
+
+//========================================================================
 #include "widget.h"
 #include <QApplication>
 #include <QDebug>
@@ -8,9 +11,18 @@
 
 #include "loggertool.h"
 
-void foo_bad(){
-    int *foo = (int*)-1;
-    printf("%d\n", *foo);
+class TestClass{
+
+public:
+    void badMethod(){
+        char * p = NULL;
+        *p = 0;
+    }
+};
+
+void bad_foo(){
+    TestClass testClass;
+    testClass.badMethod();
 }
 
 int main(int argc, char *argv[]){
@@ -21,7 +33,8 @@ int main(int argc, char *argv[]){
     loggerSet.initLog(LoggerTool::AppOutputLog | LoggerTool::UserEventLog |
                       LoggerTool::CrashLog);
 
-    foo_bad();
+    // test crash
+    bad_foo();
 
 
     Widget w;
@@ -29,3 +42,4 @@ int main(int argc, char *argv[]){
 
     return a.exec();
 }
+
