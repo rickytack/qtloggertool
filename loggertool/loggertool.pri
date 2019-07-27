@@ -1,4 +1,7 @@
 
+INCLUDEPATH += \
+    $$PWD
+
 SOURCES += \
     $$PWD/usereventlogger.cpp \
     $$PWD/appoutputlogger.cpp \
@@ -9,4 +12,5 @@ HEADERS += \
     $$PWD/usereventlogger.h \
     $$PWD/appoutputlogger.h \
     $$PWD/crashhandler.h \
-    $$PWD/loggertool.h
+    $$PWD/loggertool.h \
+    $$PWD/loggertoolglobal.h

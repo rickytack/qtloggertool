@@ -1,10 +1,3 @@
-/****************************************************************************
-**
-** Copyright (C) 2017 Ricky Tack
-** Contact: rickytack9@gmail.com
-**
-****************************************************************************/
-
 #include <QDateTime>
 #include <QDebug>
 #include <QDir>
@@ -27,6 +20,7 @@ QStringList AppOutputLogger::message_type =
 };
 
 QFile AppOutputLogger::logFile;
+QMutex AppOutputLogger::fileMutex;
 QTextStream AppOutputLogger::outTextStream;
 bool AppOutputLogger::showPlace;
 
@@ -79,7 +73,6 @@ void AppOutputLogger::stopLog(){
         qInstallMsgHandler(0);
 #   endif
         logFile.close();
-        outTextStream.reset();
         m_isStarted = false;
     }
 }
@@ -88,6 +81,7 @@ void AppOutputLogger::stopLog(){
 void AppOutputLogger::messageOutput(QtMsgType type, const QMessageLogContext &context,
                                     const QString &msg){
 
+    QMutexLocker locker(&fileMutex);
     QString strData;
     QString strMessage = message_type[type] + QTime::currentTime().toString() + "  " + msg;
     if(showPlace){
@@ -106,10 +100,15 @@ void AppOutputLogger::messageOutput(QtMsgType type, const QMessageLogContext &co
 #else
 void AppOutputLogger::messageOutput(QtMsgType type, const char* msg){
 
-    QString strData = message_type[type] + QTime::currentTime().toString()+ "  " + msg + "\n";
+    QMutexLocker locker(&fileMutex);
+    QString strData = message_type[type] + QTime::currentTime().toString()+ " " + msg + "\n";
 
-    std::cerr << strData.toStdString();
+    char *rawData = strData.toUtf8().data();
+    std::cerr << rawData;
     if ( logFile.isOpen() ){
+//        logFile.write(rawData, strData.size());
+//        logFile.flush();
+
         outTextStream << strData;
         outTextStream.flush();
     }

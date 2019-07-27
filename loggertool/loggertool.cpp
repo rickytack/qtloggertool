@@ -1,14 +1,8 @@
-/****************************************************************************
-**
-** Copyright (C) 2017 Ricky Tack
-** Contact: rickytack9@gmail.com
-**
-****************************************************************************/
-
 #include <QDateTime>
 #include <QDebug>
 #include <QDir>
 #include <QCoreApplication>
+#include <QSettings>
 
 #include "crashhandler.h"
 #include "loggertool.h"

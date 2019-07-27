@@ -1,10 +1,3 @@
-/****************************************************************************
-**
-** Copyright (C) 2017 Ricky Tack
-** Contact: rickytack9@gmail.com
-**
-****************************************************************************/
-
 #ifndef APPOUTPUTLOGGER_H
 #define APPOUTPUTLOGGER_H
 
@@ -12,7 +5,7 @@
 #include <QStringList>
 #include <QFile>
 #include <QTextStream>
-
+#include <QMutex>
 //
 class AppOutputLogger
 {
@@ -42,6 +35,8 @@ private: // feilds
 
     static QFile logFile;
     static QTextStream outTextStream;
+
+    static QMutex fileMutex;
 
     static bool showPlace;
 };

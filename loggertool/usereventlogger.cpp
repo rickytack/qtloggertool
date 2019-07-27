@@ -1,15 +1,9 @@
-/****************************************************************************
-**
-** Copyright (C) 2017 Ricky Tack
-** Contact: rickytack9@gmail.com
-**
-****************************************************************************/
-
 #include <QDateTime>
 #include <QApplication>
 #include <QDebug>
 #include <QMouseEvent>
 
+#include "loggertoolglobal.h"
 #include "usereventlogger.h"
 
 QFile UserEventLogger::logFile;
@@ -38,9 +32,10 @@ void UserEventLogger::startLog(const QString &logFileName){
                           << separator << "event_type"
                           << separator << "button_or_key"
                           << separator << "modifiers"
-                          << separator << "ckick_position"
-                          << separator << "receiver"
-                          << separator << "parent_of_receiver" << endl; // 7 columns
+                          << separator << "local_ckick_position"
+                          << separator << "global_ckick_position"
+                          //<< separator << "receiver"
+                          << separator << "full_path" << endl; // 7 columns
 
             // register callback
             QInternal::registerCallback(QInternal::EventNotifyCallback, eventCallback);
@@ -59,11 +54,19 @@ void UserEventLogger::stopLog(){
     }
 }
 //=========================================================================
+//DragEnter = 60,                         // drag moves into widget
+//DragMove = 61,                          // drag moves in widget
+//DragLeave = 62,                         // drag leaves or is cancelled
+//Drop = 63,                              // actual drop
+//DragResponse = 64,                      // drag accepted/rejected
 bool UserEventLogger::eventCallback(void** data){
 
     QObject* receiver = reinterpret_cast<QObject*>(data[0]);
     QEvent* event = reinterpret_cast<QEvent*>(data[1]);
-
+//
+    // getFullObjectPath
+    QString fullObjectPath = LoggerToolGlobal::getFullObjectPath(receiver);
+//
     //  mouse events
     if(event->type() == QEvent::MouseButtonPress ||
             event->type() == QEvent::MouseButtonRelease ||
@@ -71,15 +74,14 @@ bool UserEventLogger::eventCallback(void** data){
 
         QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
 
-        outTextStream << QTime::currentTime().toString()
-                      << separator << event->type()
-                      << separator << mouseEvent->button()
-                      << separator << mouseEvent->modifiers()
-                      << separator << mouseEvent->pos().x() << ":" << mouseEvent->pos().y()
-                      << separator << receiver->objectName();
-        QObject *parent = receiver->parent();
-        if(parent) outTextStream << separator << parent->objectName();
-        else outTextStream << separator << "Unknown";
+        outTextStream << QTime::currentTime().toString("HH:mm:ss:zzz")
+                << separator << event->type()
+                << separator << mouseEvent->button()
+                << separator << mouseEvent->modifiers()
+                << separator << mouseEvent->pos().x() << ":" << mouseEvent->pos().y()
+                << separator << mouseEvent->globalPos().x() << ":" << mouseEvent->globalPos().y()
+                << separator << fullObjectPath;
+        //qDebug() << (int)event->type() << "fullObjectPath" << fullObjectPath << mouseEvent->pos();
         outTextStream << endl;
     }
 
@@ -88,16 +90,25 @@ bool UserEventLogger::eventCallback(void** data){
 
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
-        outTextStream << QTime::currentTime().toString()
-                      << separator <<  event->type()
-                      << separator << keyEvent->key()
-                      << separator
-                      << separator
-                      << separator << receiver->objectName();
-        QObject *parent = receiver->parent();
-        if(parent) outTextStream << separator << parent->objectName();
-        else outTextStream << separator << "Unknown";
+        outTextStream << QTime::currentTime().toString("HH:mm:ss:zzz")
+                << separator <<  event->type()
+                << separator << keyEvent->key()
+                << separator
+                << separator
+                << separator
+                << separator << fullObjectPath;
         outTextStream << endl;
+        //qDebug() << (int)event->type() << "fullObjectPath" << fullObjectPath << keyEvent->key();
     }
+
+    // drag and drop
+    else if(event->type() == QEvent::DragEnter || event->type() == QEvent::DragLeave ||
+            event->type() == QEvent::Drop){
+
+        //qDebug() << "DrafDropEvent" << event->type();
+    }
+
     return false;
 }
+//=========================================================================
+

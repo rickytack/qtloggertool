@@ -1,10 +1,3 @@
-/****************************************************************************
-**
-** Copyright (C) 2017 Ricky Tack
-** Contact: rickytack9@gmail.com
-**
-****************************************************************************/
-
 #ifndef LOGGERSET_H
 #define LOGGERSET_H
 
@@ -13,13 +6,15 @@
 #include "usereventlogger.h"
 #include "appoutputlogger.h"
 
+class QApplication;
+
 class LoggerTool
 {
 public:
     enum LoggerType{
-        AppOutputLog = 0b0000001, // Qt app output (qDebug(), qWarning(),..)
-        UserEventLog = 0b0000010, // User activity (mouse and keys)
-        CrashLog     = 0b0000100  // Backtrace in case of crash
+        AppOutputLog = (1 << 0), // Qt app output (qDebug(), qWarning(),..)
+        UserEventLog = (1 << 1), // User activity (mouse and keys)
+        CrashLog     = (1 << 2)  // Backtrace in case of crash
     };
 
     LoggerTool();

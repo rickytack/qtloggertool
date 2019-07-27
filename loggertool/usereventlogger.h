@@ -1,9 +1,3 @@
-/****************************************************************************
-**
-** Copyright (C) 2017 Ricky Tack
-** Contact: rickytack9@gmail.com
-**
-****************************************************************************/
 
 #ifndef USEREVENTLOGGER_H
 #define USEREVENTLOGGER_H
